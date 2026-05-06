@@ -176,6 +176,10 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
       </div>
       <div class="deg-big" id="deg-val">---°</div>
       <div class="deg-nm" id="deg-nm">Pointez vers le frelon</div>
+      <div id="stab-indicator" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 12px;border-radius:20px;background:#f0ebe0;font-size:11px;font-weight:700;color:var(--muted)">
+        <div id="stab-dot" style="width:8px;height:8px;border-radius:50%;background:#ccc;transition:background .4s"></div>
+        <span id="stab-txt">En attente...</span>
+      </div>
     </div>
   </div>
 
@@ -314,16 +318,51 @@ function askPerm() {
     }
   });
 }
+// Filtre passe-bas boussole
+// ALPHA 0.15 = lissage fort (~20 mesures), suffisamment réactif sur le terrain
+const COMPASS_ALPHA = 0.15;
+let _ssin = null, _scos = null;
+
 function onOrient(e) {
-  let h=null;
-  if(e.webkitCompassHeading!==undefined) h=e.webkitCompassHeading;
-  else if(e.alpha!==null) h=(360-e.alpha+360)%360;
-  if(h===null) return;
-  currentHeading=Math.round(h);
-  const rose=document.getElementById('crose');
-  if(rose) rose.style.transform=`rotate(${-h}deg)`;
-  document.getElementById('deg-val').textContent=currentHeading+'°';
-  document.getElementById('deg-nm').textContent=dirNm(currentHeading);
+  let h = null;
+  if (e.webkitCompassHeading !== undefined) h = e.webkitCompassHeading;
+  else if (e.alpha !== null) h = (360 - e.alpha + 360) % 360;
+  if (h === null) return;
+
+  // Filtrage en sin/cos pour éviter le bug de wrap 359°→1°
+  const rad = h * Math.PI / 180;
+  if (_ssin === null) { _ssin = Math.sin(rad); _scos = Math.cos(rad); }
+  else {
+    _ssin += COMPASS_ALPHA * (Math.sin(rad) - _ssin);
+    _scos += COMPASS_ALPHA * (Math.cos(rad) - _scos);
+  }
+  const smoothed = ((Math.atan2(_ssin, _scos) * 180 / Math.PI) + 360) % 360;
+  currentHeading = Math.round(smoothed);
+
+  const rose = document.getElementById('crose');
+  if (rose) rose.style.transform = `rotate(${-smoothed}deg)`;
+  document.getElementById('deg-val').textContent = currentHeading + '°';
+  document.getElementById('deg-nm').textContent = dirNm(currentHeading);
+  updateStabilityIndicator(smoothed);
+}
+
+// Indicateur de stabilité : mesure la variance sur les 8 dernières valeurs
+const _headingHistory = [];
+function updateStabilityIndicator(smoothed) {
+  _headingHistory.push(smoothed);
+  if (_headingHistory.length > 8) _headingHistory.shift();
+  if (_headingHistory.length < 4) return;
+  // Variance circulaire
+  let ss = 0, sc = 0;
+  _headingHistory.forEach(a => { ss += Math.sin(a*Math.PI/180); sc += Math.cos(a*Math.PI/180); });
+  const n = _headingHistory.length;
+  const R = Math.sqrt(ss*ss + sc*sc) / n; // R=1 parfaitement stable, R=0 chaos
+  const dot = document.getElementById('stab-dot');
+  const txt = document.getElementById('stab-txt');
+  if (!dot) return;
+  if (R > 0.995) { dot.style.background='#4ade80'; txt.textContent='Stable — prêt à enregistrer'; txt.style.color='#2d6b45'; }
+  else if (R > 0.97) { dot.style.background='#facc15'; txt.textContent='Presque stable...'; txt.style.color='#92640a'; }
+  else { dot.style.background='#f87171'; txt.textContent='Bougez moins le téléphone'; txt.style.color='#991b1b'; }
 }
 function dirNm(d){return['Nord','Nord-Est','Est','Sud-Est','Sud','Sud-Ouest','Ouest','Nord-Ouest'][Math.round(d/45)%8];}
 
