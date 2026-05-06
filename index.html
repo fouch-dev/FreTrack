@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FreTrack">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <title>FreTrack v2</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -185,19 +187,16 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 
 <!-- CARTE -->
 <div class="page" id="page-map">
-  <div class="card" style="padding:12px">
-    <div class="card-ttl" style="margin-bottom:6px">Point d'observation</div>
-    <div id="ref-disp" style="font-size:12px;color:var(--muted)">Non défini</div>
-    <button class="btn bp" style="margin-top:8px;padding:10px" onclick="setRef()">📍 Ma position actuelle</button>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <button class="btn bp" style="font-size:13px;padding:11px" onclick="setRef()">📍 Ma position</button>
+    <button class="btn bs" style="font-size:13px;padding:11px" onclick="centerMap()">🎯 Centrer</button>
   </div>
-  <div class="card" style="padding:12px">
-    <div class="card-ttl" style="margin-bottom:6px">Carte de triangulation</div>
-    <canvas id="map-canvas" width="356" height="356"></canvas>
-    <div class="legend">
-      <div class="li"><div class="ld" style="background:#2d6b45"></div>Vous</div>
-      <div class="li"><div class="ld" style="background:#e8a020"></div>Direction</div>
-      <div class="li"><div class="ld" style="background:#d94040"></div>Nid estimé</div>
-    </div>
+  <div id="ref-disp" style="font-size:12px;color:var(--muted);margin-bottom:8px;padding:0 2px">GPS non défini — appuyez sur Ma position</div>
+  <div id="leaflet-map" style="width:100%;height:420px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)"></div>
+  <div class="legend" style="margin-top:8px">
+    <div class="li"><div class="ld" style="background:#2d6b45"></div>Vous</div>
+    <div class="li"><div class="ld" style="background:#e8a020"></div>Direction frelon</div>
+    <div class="li"><div class="ld" style="background:#d94040"></div>Nid estimé</div>
   </div>
 </div>
 
@@ -253,7 +252,10 @@ function sw(t) {
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
   document.getElementById('page-'+t).classList.add('on');
   document.getElementById('tab-'+t).classList.add('on');
-  if(t==='map') drawMap();
+  if(t==='map') {
+    // Leaflet doit être visible avant init/invalidateSize
+    setTimeout(()=>{ drawMap(); if(leafletMap) leafletMap.invalidateSize(); }, 50);
+  }
   if(t==='stats') updateStats();
   if(t==='obs') renderObs();
   if(t==='compass') renderAssign();
@@ -276,7 +278,12 @@ function setRef() {
   updateRefDisp(); toast('Position enregistrée !'); drawMap();
 }
 function updateRefDisp() {
-  if(refPos) document.getElementById('ref-disp').innerHTML=`<span style="color:var(--g-mid);font-weight:600">Lat ${refPos.lat.toFixed(5)} · Lng ${refPos.lng.toFixed(5)}</span>`;
+  const el = document.getElementById('ref-disp');
+  if (refPos) {
+    el.innerHTML = `<span style="color:var(--g-mid);font-weight:600">📍 Lat ${refPos.lat.toFixed(5)} · Lng ${refPos.lng.toFixed(5)}</span>`;
+  }
+  // Si la carte est visible, on la redessine
+  if (leafletMap && document.getElementById('page-map').classList.contains('on')) drawMap();
 }
 
 // COMPASS
@@ -437,57 +444,124 @@ function fmtMs(ms){
 function fmtMsLong(ms){const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000);return m>0?`${m}m ${s}s`:`${s}s`;}
 function distM(ms){return Math.round((ms/1000/2)*2.22);}
 
-// MAP
-function drawMap(){
-  const canvas=document.getElementById('map-canvas');
-  const W=canvas.parentElement.clientWidth-24; canvas.width=W; canvas.height=W;
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,W,W);
-  ctx.fillStyle='#e8f0e0'; ctx.fillRect(0,0,W,W);
-  ctx.strokeStyle='rgba(0,0,0,0.05)'; ctx.lineWidth=1;
-  for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,W);ctx.stroke();}
-  for(let y=0;y<W;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  const cx=W/2,cy=W/2;
-  if(!observations.length){ctx.fillStyle='#5a7a5a';ctx.font='13px -apple-system';ctx.textAlign='center';ctx.fillText('Aucune observation',cx,cy);goto_draw_origin(ctx,cx,cy);return;}
-  observations.forEach(obs=>{
-    const rad=(obs.direction-90)*Math.PI/180;
-    const len=Math.min(W*0.44,140);
-    const ex=cx+Math.cos(rad)*len,ey=cy+Math.sin(rad)*len;
-    ctx.strokeStyle=(obs.color||'#e8a020')+'bb'; ctx.lineWidth=1.8; ctx.setLineDash([6,4]);
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
-    const ang=Math.atan2(ey-cy,ex-cx);
-    ctx.fillStyle=obs.color||'#e8a020';
-    ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-9*Math.cos(ang-.4),ey-9*Math.sin(ang-.4));ctx.lineTo(ex-9*Math.cos(ang+.4),ey-9*Math.sin(ang+.4));ctx.closePath();ctx.fill();
-    const dp=Math.min((obs.timeMs/2000)*5,len*.95);
-    const dx=cx+Math.cos(rad)*dp,dy=cy+Math.sin(rad)*dp;
-    ctx.fillStyle='#d94040';ctx.beginPath();ctx.arc(dx,dy,5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#1a3a2a';ctx.font='bold 9px -apple-system';ctx.textAlign='center';ctx.fillText(obs.frelon,dx,dy-8);
-  });
-  if(observations.length>=2){
-    const v=meanVec();
-    const rad=(v.dir-90)*Math.PI/180;
-    const dp=Math.min((v.ms/2000)*5,W*0.44*.95);
-    const nx=cx+Math.cos(rad)*dp,ny=cy+Math.sin(rad)*dp;
-    ctx.strokeStyle='rgba(217,64,64,.6)';ctx.lineWidth=2;ctx.setLineDash([5,3]);
-    ctx.beginPath();ctx.arc(nx,ny,20,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
-    ctx.strokeStyle='#d94040';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(nx-12,ny);ctx.lineTo(nx+12,ny);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(nx,ny-12);ctx.lineTo(nx,ny+12);ctx.stroke();
-    ctx.fillStyle='#d94040';ctx.font='bold 10px -apple-system';ctx.textAlign='center';ctx.fillText('Nid ?',nx,ny+30);
-  }
-  goto_draw_origin(ctx,cx,cy);
-  // mini compass
-  const cr=18,cmx=W-cr-8,cmy=cr+8;
-  ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(cmx,cmy,cr,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#1a3a2a';ctx.lineWidth=1;ctx.beginPath();ctx.arc(cmx,cmy,cr,0,Math.PI*2);ctx.stroke();
-  ctx.fillStyle='#d94040';ctx.beginPath();ctx.moveTo(cmx,cmy-cr+4);ctx.lineTo(cmx-4,cmy);ctx.lineTo(cmx+4,cmy);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#1a3a2a';ctx.beginPath();ctx.moveTo(cmx,cmy+cr-4);ctx.lineTo(cmx-4,cmy);ctx.lineTo(cmx+4,cmy);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#d94040';ctx.font='bold 8px -apple-system';ctx.textAlign='center';ctx.fillText('N',cmx,cmy-cr-2);
+// MAP — Leaflet / OpenStreetMap
+let leafletMap = null;
+let mapLayers = { origin: null, rays: [], distDots: [], estimate: null, estimateCircle: null };
+
+function initLeafletMap() {
+  if (leafletMap) return;
+  const center = refPos ? [refPos.lat, refPos.lng] : [46.5, 2.5]; // France par défaut
+  const zoom = refPos ? 16 : 6;
+  leafletMap = L.map('leaflet-map', { zoomControl: true, attributionControl: true }).setView(center, zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(leafletMap);
 }
-function goto_draw_origin(ctx,cx,cy){
-  ctx.fillStyle='#1a3a2a';ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='white';ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#1a3a2a';ctx.font='bold 10px -apple-system';ctx.textAlign='center';ctx.fillText('Vous',cx,cy+19);
+
+function drawMap() {
+  initLeafletMap();
+  clearMapLayers();
+
+  const origin = refPos || currentPos;
+  if (!origin) return;
+
+  // Marqueur position d'observation
+  const youIcon = L.divIcon({
+    html: `<div style="width:16px;height:16px;border-radius:50%;background:#1a3a2a;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`,
+    iconSize: [16, 16], iconAnchor: [8, 8], className: ''
+  });
+  mapLayers.origin = L.marker([origin.lat, origin.lng], { icon: youIcon })
+    .bindPopup('<b>Votre position</b>').addTo(leafletMap);
+
+  if (!observations.length) {
+    leafletMap.setView([origin.lat, origin.lng], 16);
+    return;
+  }
+
+  const bounds = [[origin.lat, origin.lng]];
+
+  observations.forEach(obs => {
+    // Calcul du point de distance estimée
+    const distM = Math.round((obs.timeMs / 1000 / 2) * 2.22);
+    const endPt = destPoint(origin.lat, origin.lng, obs.direction, distM);
+    const farPt = destPoint(origin.lat, origin.lng, obs.direction, distM * 3); // rayon long pour affichage
+
+    // Rayon de direction (ligne pointillée longue)
+    const ray = L.polyline([[origin.lat, origin.lng], [farPt.lat, farPt.lng]], {
+      color: obs.color || '#e8a020', weight: 2, opacity: 0.7, dashArray: '8,6'
+    }).addTo(leafletMap);
+    ray.bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° · ~${distM}m`);
+    mapLayers.rays.push(ray);
+
+    // Point distance estimée
+    const dotIcon = L.divIcon({
+      html: `<div style="width:10px;height:10px;border-radius:50%;background:${obs.color||'#e8a020'};border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+             <div style="font-size:9px;font-weight:700;color:#1a3a2a;white-space:nowrap;margin-top:1px;text-shadow:0 0 3px white">${obs.frelon}</div>`,
+      iconSize: [10, 10], iconAnchor: [5, 5], className: ''
+    });
+    const dot = L.marker([endPt.lat, endPt.lng], { icon: dotIcon })
+      .bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° ${dirNm(obs.direction)}<br>Temps : ${fmtMsLong(obs.timeMs)}<br>Distance estimée : ~${distM}m`)
+      .addTo(leafletMap);
+    mapLayers.distDots.push(dot);
+    bounds.push([endPt.lat, endPt.lng]);
+  });
+
+  // Zone estimée (moyenne vectorielle)
+  if (observations.length >= 2) {
+    const v = meanVec();
+    const dm = Math.round((v.ms / 1000 / 2) * 2.22);
+    const estPt = destPoint(origin.lat, origin.lng, v.dir, dm);
+    bounds.push([estPt.lat, estPt.lng]);
+
+    // Cercle d'incertitude
+    mapLayers.estimateCircle = L.circle([estPt.lat, estPt.lng], {
+      radius: Math.max(dm * 0.25, 10),
+      color: '#d94040', fillColor: '#d94040', fillOpacity: 0.15, weight: 2, dashArray: '5,4'
+    }).addTo(leafletMap);
+
+    // Marqueur nid estimé
+    const nestIcon = L.divIcon({
+      html: `<div style="background:#d94040;color:white;font-size:11px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)">🐝 Nid ?</div>`,
+      iconSize: [60, 24], iconAnchor: [30, 12], className: ''
+    });
+    mapLayers.estimate = L.marker([estPt.lat, estPt.lng], { icon: nestIcon })
+      .bindPopup(`<b>Nid estimé</b><br>Direction : ${Math.round(v.dir)}° ${dirNm(Math.round(v.dir))}<br>Distance : ~${dm}m<br>Incertitude : ±${Math.round(dm*.25)}m`)
+      .addTo(leafletMap);
+  }
+
+  // Ajustement de la vue
+  if (bounds.length > 1) leafletMap.fitBounds(bounds, { padding: [30, 30] });
+  else leafletMap.setView([origin.lat, origin.lng], 16);
+}
+
+function clearMapLayers() {
+  if (!leafletMap) return;
+  if (mapLayers.origin) leafletMap.removeLayer(mapLayers.origin);
+  mapLayers.rays.forEach(l => leafletMap.removeLayer(l));
+  mapLayers.distDots.forEach(l => leafletMap.removeLayer(l));
+  if (mapLayers.estimate) leafletMap.removeLayer(mapLayers.estimate);
+  if (mapLayers.estimateCircle) leafletMap.removeLayer(mapLayers.estimateCircle);
+  mapLayers = { origin: null, rays: [], distDots: [], estimate: null, estimateCircle: null };
+}
+
+function centerMap() {
+  if (!leafletMap) return;
+  const c = refPos || currentPos;
+  if (c) leafletMap.setView([c.lat, c.lng], 16);
+  else toast('GPS non disponible');
+}
+
+// Calcul d'un point à distance+azimut depuis lat/lng (formule haversine inverse)
+function destPoint(lat, lng, bearingDeg, distM) {
+  const R = 6371000;
+  const d = distM / R;
+  const b = bearingDeg * Math.PI / 180;
+  const lat1 = lat * Math.PI / 180;
+  const lng1 = lng * Math.PI / 180;
+  const lat2 = Math.asin(Math.sin(lat1)*Math.cos(d) + Math.cos(lat1)*Math.sin(d)*Math.cos(b));
+  const lng2 = lng1 + Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(lat1), Math.cos(d)-Math.sin(lat1)*Math.sin(lat2));
+  return { lat: lat2 * 180/Math.PI, lng: lng2 * 180/Math.PI };
 }
 
 // OBS
