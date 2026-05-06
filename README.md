@@ -69,7 +69,7 @@ Distance estimée = (temps aller-retour ÷ 2) × 2,2 m/s
 Pour une triangulation précise :
 - Capturez **au moins 5 individus** différents
 - Si possible, répétez depuis **2 points distants de 30 à 50 m** pour croiser les rayons
-- Les nids sont souvent dans les arbres de grande hauteur, en lisière de forêt
+- Les nids sont souvent dans les arbres de grande hauteur, en lisière de forêt mias ils peuvent aussi être sous terre
 
 ---
 
