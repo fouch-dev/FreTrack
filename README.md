@@ -107,6 +107,6 @@ MIT — libre d'utilisation, de modification et de partage.
 ---
 
 <div align="center">
-  <sub>Fait avec ❤️ par un apiculteur, pour les apiculteurs.<br>
+  <sub>Fait avec ❤️ par un apiculteur, pour les apiculteurs et avec l'aide de Claude.ai.<br>
   <i>Protégeons nos abeilles.</i> 🍯</sub>
 </div>
