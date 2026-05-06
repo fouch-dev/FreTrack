@@ -573,15 +573,24 @@ function drawMap() {
   observations.forEach(obs => {
     // Calcul du point de distance estimée
     const distM = Math.round((obs.timeMs / 1000 / 2) * 2.22);
+    // Point de demi-tour estimé
     const endPt = destPoint(origin.lat, origin.lng, obs.direction, distM);
-    const farPt = destPoint(origin.lat, origin.lng, obs.direction, distM * 3); // rayon long pour affichage
+    // Extrémité du rayon : on projette loin (5 km) pour aller jusqu'au bord de la carte
+    const farPt = destPoint(origin.lat, origin.lng, obs.direction, 5000);
 
-    // Rayon de direction (ligne pointillée longue)
-    const ray = L.polyline([[origin.lat, origin.lng], [farPt.lat, farPt.lng]], {
-      color: obs.color || '#e8a020', weight: 2, opacity: 0.7, dashArray: '8,6'
+    // Segment 1 : origine → point de demi-tour (trait plein, plus épais)
+    const rayNear = L.polyline([[origin.lat, origin.lng], [endPt.lat, endPt.lng]], {
+      color: obs.color || '#e8a020', weight: 3, opacity: 0.9
     }).addTo(leafletMap);
-    ray.bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° · ~${distM}m`);
-    mapLayers.rays.push(ray);
+    rayNear.bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° · ~${distM}m`);
+    mapLayers.rays.push(rayNear);
+
+    // Segment 2 : point de demi-tour → bord de carte (pointillé fin)
+    const rayFar = L.polyline([[endPt.lat, endPt.lng], [farPt.lat, farPt.lng]], {
+      color: obs.color || '#e8a020', weight: 1.5, opacity: 0.45, dashArray: '6,7'
+    }).addTo(leafletMap);
+    rayFar.bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° · ~${distM}m`);
+    mapLayers.rays.push(rayFar);
 
     // Point distance estimée
     const dotIcon = L.divIcon({
