@@ -94,7 +94,7 @@ Pour une triangulation précise :
 
 Les suggestions sont les bienvenues ! Idées en cours :
 
-- [ ] Mode multi-points d'observation (triangulation depuis 2 positions GPS distinctes)
+- [ ] Mode multi-points d'observation (triangulation depuis 2 positions GPS distinctes sur une même carte en synchrone ou asynchrone)
 - [ ] Historique de sessions par date
 - [ ] Export GPX pour import dans QGIS / Google Maps
 - [ ] Mode nuit pour utilisation en conditions de faible luminosité
