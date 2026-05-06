@@ -244,7 +244,14 @@ let refPos = JSON.parse(localStorage.getItem('fr2') || 'null');
 let currentPos = null;
 let currentHeading = null;
 let slotCnt = 0;
-const COLORS = ['#e8a020','#2d6b45','#d94040','#5b4bb5','#1a7a8a','#b54b4b','#2a6a8a','#8a5a2a'];
+const FRELONS = [
+  { name: 'Jaune',  color: '#f5c800' },
+  { name: 'Bleu',   color: '#1a6bbf' },
+  { name: 'Rouge',  color: '#d94040' },
+  { name: 'Blanc',  color: '#cccccc' },
+  { name: 'Vert',   color: '#2d6b45' },
+  { name: 'Orange', color: '#e8610a' },
+];
 
 // TABS
 function sw(t) {
@@ -322,9 +329,10 @@ function dirNm(d){return['Nord','Nord-Est','Est','Sud-Est','Sud','Sud-Ouest','Ou
 
 // SLOTS
 function addSlot() {
+  const f = FRELONS[slotCnt % FRELONS.length];
   slotCnt++;
-  slots.push({id:Date.now(),name:'F'+slotCnt,color:COLORS[(slotCnt-1)%COLORS.length],state:'idle',start:0,elapsed:0,iv:null});
-  document.getElementById('slots-empty').style.display='none';
+  slots.push({ id: Date.now(), name: f.name, color: f.color, state:'idle', start:0, elapsed:0, iv:null });
+  document.getElementById('slots-empty').style.display = 'none';
   renderSlots();
 }
 
