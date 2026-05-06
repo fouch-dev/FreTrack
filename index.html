@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FreTrack">
+<link rel="manifest" href="manifest.json">
+<title>FreTrack v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --g-dark:#1a3a2a; --g-mid:#2d6b45; --g-light:#4a9e68; --g-pale:#a8d5b5;
+  --amber:#e8a020; --amber-d:#c47a10; --red:#d94040;
+  --bg:#f0ebe0; --card:#ffffff; --text:#1a2a1a; --muted:#5a7a5a;
+  --border:rgba(0,0,0,0.09); --shadow:0 2px 10px rgba(0,0,0,0.10);
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; max-width:430px; margin:0 auto; }
+header { background:var(--g-dark); color:white; padding:12px 14px 8px; position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:8px; }
+header h1 { font-size:17px; font-weight:700; flex:1; }
+.sub { font-size:10px; color:var(--g-pale); text-transform:uppercase; letter-spacing:.5px; }
+.gps-pill { font-size:10px; padding:3px 8px; border-radius:20px; background:rgba(255,255,255,.12); color:white; display:flex; align-items:center; gap:4px; }
+.dot { width:6px; height:6px; border-radius:50%; background:#999; }
+.dot.on { background:#4ade80; animation:blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.tabs { display:flex; background:var(--g-dark); border-top:1px solid rgba(255,255,255,.08); }
+.tab { flex:1; padding:9px 2px 11px; text-align:center; color:rgba(255,255,255,.4); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; border-bottom:3px solid transparent; transition:all .2s; }
+.tab.on { color:var(--g-pale); border-bottom-color:var(--g-pale); }
+.tab i { font-size:17px; display:block; margin-bottom:1px; font-style:normal; }
+.page { display:none; padding:12px; }
+.page.on { display:block; }
+.card { background:var(--card); border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:var(--shadow); border:1px solid var(--border); }
+.card-ttl { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+
+/* SLOTS */
+.slots-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.add-btn { display:flex; align-items:center; gap:5px; padding:7px 14px; border:none; border-radius:20px; background:var(--g-mid); color:white; font-size:13px; font-weight:700; cursor:pointer; }
+.add-btn:active { transform:scale(.97); }
+.slot { border-radius:13px; margin-bottom:8px; border:1.5px solid var(--border); overflow:hidden; }
+.slot.running { border-color:var(--g-light); }
+.slot.done { border-color:var(--amber); }
+.slot.recorded { border-color:#999; opacity:.65; }
+.slot-hd { display:flex; align-items:center; gap:10px; padding:11px 13px; background:var(--card); }
+.scdot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.sname-in { flex:1; background:transparent; border:none; outline:none; font-size:15px; font-weight:700; color:var(--text); font-family:inherit; padding:0; }
+.stime { font-size:22px; font-weight:800; color:var(--g-dark); font-variant-numeric:tabular-nums; letter-spacing:-1px; min-width:72px; text-align:right; }
+.slot.running .stime { color:var(--g-light); }
+.slot.done .stime { color:var(--amber-d); }
+.slot-ctrls { display:flex; padding:0 10px 10px; gap:7px; background:var(--card); }
+.sc { flex:1; padding:10px 6px; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; }
+.sc:active { transform:scale(.97); }
+.sc-go { background:var(--g-mid); color:white; }
+.sc-stop { background:var(--red); color:white; }
+.sc-rst { background:#e8e0d0; color:var(--text); max-width:44px; }
+.sc-rec { background:var(--amber); color:white; }
+.sc-del { background:#f0e8e8; color:var(--red); max-width:44px; }
+.slot-st { font-size:10px; padding:2px 8px 10px 13px; color:var(--muted); background:var(--card); }
+
+/* COMPASS */
+.cmp-wrap { position:relative; width:200px; height:200px; margin:0 auto 12px; }
+.cring { width:200px; height:200px; border-radius:50%; border:3px solid var(--g-dark); background:radial-gradient(circle,#f9f6ee,#ede8da); box-shadow:0 4px 16px rgba(0,0,0,.2),inset 0 1px 3px rgba(255,255,255,.8); position:relative; overflow:visible; }
+.crose { position:absolute; inset:0; transition:transform .08s ease-out; }
+.clbl { position:absolute; inset:0; pointer-events:none; }
+.clbl span { position:absolute; font-size:13px; font-weight:800; color:var(--g-dark); }
+.cn{top:5px;left:50%;transform:translateX(-50%);} .cs{bottom:5px;left:50%;transform:translateX(-50%);} .ce{right:7px;top:50%;transform:translateY(-50%);} .cw{left:7px;top:50%;transform:translateY(-50%);}
+.nwrap { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; pointer-events:none; }
+.nn { width:4px; height:72px; background:var(--red); border-radius:4px 4px 0 0; }
+.ns { width:4px; height:72px; background:var(--g-dark); border-radius:0 0 4px 4px; }
+.cdot2 { width:11px; height:11px; border-radius:50%; background:white; border:2px solid var(--g-dark); position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; }
+.deg-big { font-size:32px; font-weight:800; color:var(--g-dark); text-align:center; font-variant-numeric:tabular-nums; }
+.deg-nm { font-size:12px; color:var(--muted); text-align:center; margin-top:2px; }
+.assign-row { display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:11px; border:1.5px solid var(--border); background:var(--bg); cursor:pointer; transition:background .15s; margin-bottom:7px; }
+.assign-row:active { background:#ddd; }
+.assign-row.used { opacity:.35; pointer-events:none; }
+.assign-nm { flex:1; font-size:14px; font-weight:700; }
+.assign-t { font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.assign-d { font-size:14px; color:var(--g-mid); font-weight:700; min-width:44px; text-align:right; }
+
+/* MAP */
+#map-canvas { display:block; width:100%; border-radius:12px; }
+.legend { display:flex; gap:10px; flex-wrap:wrap; margin-top:7px; }
+.li { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--muted); }
+.ld { width:9px; height:9px; border-radius:50%; }
+
+/* OBS */
+.obs-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+.obs-item:last-child { border-bottom:none; }
+.onum { width:26px; height:26px; border-radius:50%; background:var(--g-dark); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.oinfo { flex:1; }
+.odir { font-size:15px; font-weight:700; color:var(--g-dark); }
+.ometa { font-size:11px; color:var(--muted); margin-top:1px; }
+.odel { font-size:19px; color:var(--red); padding:4px; cursor:pointer; }
+.ftag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px; color:white; font-size:11px; font-weight:700; margin-right:4px; }
+
+/* STATS */
+.sg { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:10px; }
+.sb { background:var(--card); border-radius:12px; padding:13px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; }
+.sv { font-size:24px; font-weight:800; color:var(--g-dark); }
+.sl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+.est-card { background:var(--g-dark); color:white; border-radius:14px; padding:15px; margin-bottom:10px; }
+.et { font-size:11px; color:var(--g-pale); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+.ev { font-size:17px; font-weight:700; margin-bottom:2px; }
+.es { font-size:12px; color:var(--g-pale); }
+
+.btn { flex:1; padding:13px; border:none; border-radius:11px; font-size:14px; font-weight:700; cursor:pointer; transition:all .15s; }
+.btn:active { transform:scale(.97); }
+.bp { background:var(--g-mid); color:white; }
+.bs { background:#e8e0d0; color:var(--text); }
+.bd { background:var(--red); color:white; }
+.empty { text-align:center; padding:20px; color:var(--muted); font-size:13px; line-height:1.6; }
+.empty-i { font-size:32px; margin-bottom:6px; }
+.toast { position:fixed; bottom:76px; left:50%; transform:translateX(-50%); background:var(--g-dark); color:white; padding:9px 18px; border-radius:20px; font-size:13px; font-weight:600; z-index:200; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; max-width:92vw; text-align:center; }
+.toast.show { opacity:1; }
+.perm-msg { text-align:center; padding:16px; color:var(--muted); font-size:13px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:22px">🐝</span>
+  <div style="flex:1"><div class="sub">Triangulation frelons</div><h1>FreTrack</h1></div>
+  <div class="gps-pill"><div class="dot" id="gps-dot"></div><span id="gps-txt">GPS</span></div>
+</header>
+
+<div class="tabs">
+  <div class="tab on" onclick="sw('track')" id="tab-track"><i>⏱</i>Suivi</div>
+  <div class="tab" onclick="sw('compass')" id="tab-compass"><i>🧭</i>Direction</div>
+  <div class="tab" onclick="sw('map')" id="tab-map"><i>🗺</i>Carte</div>
+  <div class="tab" onclick="sw('obs')" id="tab-obs"><i>📋</i>Obs.</div>
+  <div class="tab" onclick="sw('stats')" id="tab-stats"><i>📊</i>Analyse</div>
+</div>
+
+<!-- SUIVI -->
+<div class="page on" id="page-track">
+  <div class="card">
+    <div class="slots-hd">
+      <div class="card-ttl" style="margin:0">Frelons en cours</div>
+      <button class="add-btn" onclick="addSlot()">＋ Frelon</button>
+    </div>
+    <div id="slots-container"></div>
+    <div id="slots-empty" class="empty" style="padding:14px">
+      <div class="empty-i">🫙</div>
+      <p>Appuyez sur <strong>＋ Frelon</strong><br>pour démarrer un suivi</p>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted);padding:0 4px;line-height:1.6">
+    💡 <strong>Workflow multi-frelons :</strong> Créez un slot par frelon marqué. Démarrez chaque chrono au départ du frelon, stoppez-le à son retour. Ensuite allez sur <strong>Direction</strong> pour enregistrer l'azimut de chacun.
+  </div>
+</div>
+
+<!-- DIRECTION -->
+<div class="page" id="page-compass">
+  <div class="card" style="text-align:center">
+    <div class="card-ttl">Boussole</div>
+    <div id="perm-msg" class="perm-msg" style="display:none">
+      <p>Autorisation boussole requise</p>
+      <button class="btn bp" style="width:auto;padding:10px 20px;font-size:13px" onclick="askPerm()">Autoriser</button>
+    </div>
+    <div id="compass-ui">
+      <div class="cmp-wrap">
+        <div class="cring">
+          <svg class="crose" id="crose" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <line x1="100" y1="18" x2="100" y2="36" stroke="#1a3a2a" stroke-width="2"/>
+            <line x1="100" y1="164" x2="100" y2="182" stroke="#1a3a2a" stroke-width="2"/>
+            <line x1="18" y1="100" x2="36" y2="100" stroke="#1a3a2a" stroke-width="2"/>
+            <line x1="164" y1="100" x2="182" y2="100" stroke="#1a3a2a" stroke-width="2"/>
+          </svg>
+          <div class="clbl"><span class="cn">N</span><span class="cs">S</span><span class="ce">E</span><span class="cw">O</span></div>
+          <div class="nwrap"><div class="nn"></div><div class="ns"></div></div>
+          <div class="cdot2"></div>
+        </div>
+      </div>
+      <div class="deg-big" id="deg-val">---°</div>
+      <div class="deg-nm" id="deg-nm">Pointez vers le frelon</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-ttl">Appuyez sur un frelon pour enregistrer sa direction</div>
+    <div id="assign-list"><div class="empty" style="padding:8px">Aucun frelon stoppé</div></div>
+  </div>
+</div>
+
+<!-- CARTE -->
+<div class="page" id="page-map">
+  <div class="card" style="padding:12px">
+    <div class="card-ttl" style="margin-bottom:6px">Point d'observation</div>
+    <div id="ref-disp" style="font-size:12px;color:var(--muted)">Non défini</div>
+    <button class="btn bp" style="margin-top:8px;padding:10px" onclick="setRef()">📍 Ma position actuelle</button>
+  </div>
+  <div class="card" style="padding:12px">
+    <div class="card-ttl" style="margin-bottom:6px">Carte de triangulation</div>
+    <canvas id="map-canvas" width="356" height="356"></canvas>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#2d6b45"></div>Vous</div>
+      <div class="li"><div class="ld" style="background:#e8a020"></div>Direction</div>
+      <div class="li"><div class="ld" style="background:#d94040"></div>Nid estimé</div>
+    </div>
+  </div>
+</div>
+
+<!-- OBS -->
+<div class="page" id="page-obs">
+  <div class="card">
+    <div class="card-ttl">Observations enregistrées</div>
+    <div id="obs-list"><div class="empty"><div class="empty-i">📭</div><p>Aucune observation</p></div></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn bs" onclick="exportCSV()">📤 CSV</button>
+    <button class="btn bd" onclick="clearAll()">🗑 Effacer</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="page" id="page-stats">
+  <div class="sg">
+    <div class="sb"><div class="sv" id="st-n">0</div><div class="sl">Observations</div></div>
+    <div class="sb"><div class="sv" id="st-t">—</div><div class="sl">Tps moyen</div></div>
+    <div class="sb"><div class="sv" id="st-d">—</div><div class="sl">Direction moy.</div></div>
+    <div class="sb"><div class="sv" id="st-dist">—</div><div class="sl">Distance est.</div></div>
+  </div>
+  <div class="est-card">
+    <div class="et">Estimation du nid</div>
+    <div class="ev" id="st-est">Pas assez de données</div>
+    <div class="es" id="st-sub">3 observations minimum</div>
+  </div>
+  <div class="card">
+    <div class="card-ttl">💡 Méthode</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7">
+      <p style="margin-bottom:6px"><strong>Vitesse Vespa velutina :</strong> ~8 km/h (2,2 m/s). Temps aller-retour ÷ 2 = durée de vol → distance ≈ durée × 2,2 m/s.</p>
+      <p><strong>Direction :</strong> Moyenne vectorielle circulaire des azimuts (évite l'erreur 0°/360°). Capturez depuis 2 points distants pour trianguler précisément.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// STATE
+let slots = [];
+let observations = JSON.parse(localStorage.getItem('fo2') || '[]');
+let refPos = JSON.parse(localStorage.getItem('fr2') || 'null');
+let currentPos = null;
+let currentHeading = null;
+let slotCnt = 0;
+const COLORS = ['#e8a020','#2d6b45','#d94040','#5b4bb5','#1a7a8a','#b54b4b','#2a6a8a','#8a5a2a'];
+
+// TABS
+function sw(t) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+t).classList.add('on');
+  document.getElementById('tab-'+t).classList.add('on');
+  if(t==='map') drawMap();
+  if(t==='stats') updateStats();
+  if(t==='obs') renderObs();
+  if(t==='compass') renderAssign();
+}
+
+// GPS
+function initGPS() {
+  if(!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(p=>{
+    currentPos={lat:p.coords.latitude,lng:p.coords.longitude};
+    document.getElementById('gps-dot').classList.add('on');
+    document.getElementById('gps-txt').textContent='GPS ✓';
+    updateRefDisp();
+  },()=>{document.getElementById('gps-txt').textContent='GPS ✗';},{enableHighAccuracy:true,maximumAge:5000});
+}
+function setRef() {
+  if(!currentPos){toast('GPS non disponible');return;}
+  refPos={...currentPos};
+  localStorage.setItem('fr2',JSON.stringify(refPos));
+  updateRefDisp(); toast('Position enregistrée !'); drawMap();
+}
+function updateRefDisp() {
+  if(refPos) document.getElementById('ref-disp').innerHTML=`<span style="color:var(--g-mid);font-weight:600">Lat ${refPos.lat.toFixed(5)} · Lng ${refPos.lng.toFixed(5)}</span>`;
+}
+
+// COMPASS
+function initCompass() {
+  if(!window.DeviceOrientationEvent) return;
+  if(typeof DeviceOrientationEvent.requestPermission==='function') {
+    document.getElementById('perm-msg').style.display='block';
+    document.getElementById('compass-ui').style.opacity='0.3';
+  } else {
+    window.addEventListener('deviceorientationabsolute',onOrient,true);
+    window.addEventListener('deviceorientation',onOrient,true);
+  }
+}
+function askPerm() {
+  DeviceOrientationEvent.requestPermission().then(s=>{
+    if(s==='granted'){
+      document.getElementById('perm-msg').style.display='none';
+      document.getElementById('compass-ui').style.opacity='1';
+      window.addEventListener('deviceorientationabsolute',onOrient,true);
+      window.addEventListener('deviceorientation',onOrient,true);
+    }
+  });
+}
+function onOrient(e) {
+  let h=null;
+  if(e.webkitCompassHeading!==undefined) h=e.webkitCompassHeading;
+  else if(e.alpha!==null) h=(360-e.alpha+360)%360;
+  if(h===null) return;
+  currentHeading=Math.round(h);
+  const rose=document.getElementById('crose');
+  if(rose) rose.style.transform=`rotate(${-h}deg)`;
+  document.getElementById('deg-val').textContent=currentHeading+'°';
+  document.getElementById('deg-nm').textContent=dirNm(currentHeading);
+}
+function dirNm(d){return['Nord','Nord-Est','Est','Sud-Est','Sud','Sud-Ouest','Ouest','Nord-Ouest'][Math.round(d/45)%8];}
+
+// SLOTS
+function addSlot() {
+  slotCnt++;
+  slots.push({id:Date.now(),name:'F'+slotCnt,color:COLORS[(slotCnt-1)%COLORS.length],state:'idle',start:0,elapsed:0,iv:null});
+  document.getElementById('slots-empty').style.display='none';
+  renderSlots();
+}
+
+function renderSlots() {
+  const c=document.getElementById('slots-container');
+  c.innerHTML='';
+  slots.forEach(s=>{
+    const ms=s.state==='running'?(Date.now()-s.start):s.elapsed;
+    const div=document.createElement('div');
+    div.className='slot '+(s.state==='running'?'running':s.state==='done'?'done':s.state==='recorded'?'recorded':'');
+    div.id='slot-'+s.id;
+
+    let ctrlHtml='';
+    if(s.state==='idle')       ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Départ</button>`;
+    else if(s.state==='running') ctrlHtml=`<button class="sc sc-stop" onclick="stopSlot(${s.id})">⏹ Stop</button>`;
+    else if(s.state==='done')   ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Reprendre</button><button class="sc sc-rec" onclick="goDir(${s.id})">🧭 Direction</button>`;
+    else if(s.state==='recorded') ctrlHtml=`<button class="sc sc-go" onclick="reuse(${s.id})">↺ Réutiliser</button>`;
+
+    const rstHtml=s.state!=='idle'?`<button class="sc sc-rst" onclick="resetSlot(${s.id})">↺</button>`:'';
+
+    const stTxt=s.state==='running'?'● En vol...'
+      :s.state==='done'?'✓ De retour — allez sur Boussole pour la direction'
+      :s.state==='recorded'?'✅ Direction enregistrée'
+      :'En attente';
+
+    div.innerHTML=`
+      <div class="slot-hd">
+        <div class="scdot" style="background:${s.color}"></div>
+        <input class="sname-in" value="${s.name}" oninput="renameSlot(${s.id},this.value)" onclick="event.stopPropagation()">
+        <div class="stime" id="st-${s.id}">${fmtMs(ms)}</div>
+      </div>
+      <div class="slot-ctrls">${ctrlHtml}${rstHtml}<button class="sc sc-del" onclick="rmSlot(${s.id})">✕</button></div>
+      <div class="slot-st">${stTxt}</div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('slots-empty').style.display=slots.length===0?'block':'none';
+}
+
+function startSlot(id) {
+  const s=slots.find(x=>x.id===id);
+  if(!s) return;
+  s.state='running'; s.start=Date.now()-s.elapsed;
+  s.iv=setInterval(()=>{
+    const el=document.getElementById('st-'+s.id);
+    if(el) el.textContent=fmtMs(Date.now()-s.start);
+  },100);
+  renderSlots();
+}
+function stopSlot(id) {
+  const s=slots.find(x=>x.id===id);
+  if(!s) return;
+  clearInterval(s.iv); s.elapsed=Date.now()-s.start; s.state='done';
+  renderSlots(); toast(`${s.name} de retour ! ${fmtMs(s.elapsed)} — allez sur 🧭 Direction`);
+}
+function resetSlot(id) {
+  const s=slots.find(x=>x.id===id);
+  if(!s) return;
+  clearInterval(s.iv); s.elapsed=0; s.state='idle'; renderSlots();
+}
+function rmSlot(id) {
+  const s=slots.find(x=>x.id===id);
+  if(s) clearInterval(s.iv);
+  slots=slots.filter(x=>x.id!==id); renderSlots();
+}
+function renameSlot(id,v) { const s=slots.find(x=>x.id===id); if(s) s.name=v; }
+function goDir(id) { sw('compass'); toast('Pointez vers la direction de vol puis appuyez sur le frelon'); }
+function reuse(id) {
+  const s=slots.find(x=>x.id===id);
+  if(!s) return;
+  clearInterval(s.iv); s.elapsed=0; s.state='idle'; renderSlots();
+}
+
+// ASSIGN DIRECTION
+function renderAssign() {
+  const el=document.getElementById('assign-list');
+  const waiting=slots.filter(s=>s.state==='done'||s.state==='running');
+  if(!waiting.length){el.innerHTML='<div class="empty" style="padding:8px">Aucun frelon stoppé en attente.<br>Stoppez un chrono sur l\'onglet Suivi.</div>';return;}
+  el.innerHTML=waiting.map(s=>`
+    <div class="assign-row" onclick="assignDir(${s.id})">
+      <div class="scdot" style="background:${s.color};width:14px;height:14px;border-radius:50%"></div>
+      <div class="assign-nm">${s.name}</div>
+      <div class="assign-t">${fmtMs(s.state==='running'?Date.now()-s.start:s.elapsed)}</div>
+      <div class="assign-d">${currentHeading!==null?currentHeading+'°':'?°'} →</div>
+    </div>
+  `).join('');
+}
+function assignDir(slotId) {
+  const s=slots.find(x=>x.id===slotId);
+  if(!s) return;
+  if(currentHeading===null){toast('Boussole non disponible !');return;}
+  const ms=s.state==='running'?(Date.now()-s.start):s.elapsed;
+  if(ms<500){toast('Chrono trop court !');return;}
+  const obs={id:Date.now(),frelon:s.name,color:s.color,direction:currentHeading,timeMs:ms,pos:currentPos?{...currentPos}:null,timestamp:new Date().toISOString()};
+  observations.push(obs);
+  localStorage.setItem('fo2',JSON.stringify(observations));
+  clearInterval(s.iv); s.elapsed=ms; s.state='recorded';
+  renderSlots(); renderAssign();
+  toast(`✓ ${s.name} · ${currentHeading}° · ${fmtMs(ms)}`);
+}
+// Keep assign list live
+setInterval(()=>{if(document.getElementById('page-compass').classList.contains('on'))renderAssign();},300);
+
+// FORMAT
+function fmtMs(ms){
+  if(!ms||ms<0) return'0.0s';
+  const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),t=Math.floor((ms%1000)/100);
+  return m>0?`${m}:${String(s).padStart(2,'0')}`:`${s}.${t}s`;
+}
+function fmtMsLong(ms){const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000);return m>0?`${m}m ${s}s`:`${s}s`;}
+function distM(ms){return Math.round((ms/1000/2)*2.22);}
+
+// MAP
+function drawMap(){
+  const canvas=document.getElementById('map-canvas');
+  const W=canvas.parentElement.clientWidth-24; canvas.width=W; canvas.height=W;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,W);
+  ctx.fillStyle='#e8f0e0'; ctx.fillRect(0,0,W,W);
+  ctx.strokeStyle='rgba(0,0,0,0.05)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,W);ctx.stroke();}
+  for(let y=0;y<W;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const cx=W/2,cy=W/2;
+  if(!observations.length){ctx.fillStyle='#5a7a5a';ctx.font='13px -apple-system';ctx.textAlign='center';ctx.fillText('Aucune observation',cx,cy);goto_draw_origin(ctx,cx,cy);return;}
+  observations.forEach(obs=>{
+    const rad=(obs.direction-90)*Math.PI/180;
+    const len=Math.min(W*0.44,140);
+    const ex=cx+Math.cos(rad)*len,ey=cy+Math.sin(rad)*len;
+    ctx.strokeStyle=(obs.color||'#e8a020')+'bb'; ctx.lineWidth=1.8; ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
+    const ang=Math.atan2(ey-cy,ex-cx);
+    ctx.fillStyle=obs.color||'#e8a020';
+    ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-9*Math.cos(ang-.4),ey-9*Math.sin(ang-.4));ctx.lineTo(ex-9*Math.cos(ang+.4),ey-9*Math.sin(ang+.4));ctx.closePath();ctx.fill();
+    const dp=Math.min((obs.timeMs/2000)*5,len*.95);
+    const dx=cx+Math.cos(rad)*dp,dy=cy+Math.sin(rad)*dp;
+    ctx.fillStyle='#d94040';ctx.beginPath();ctx.arc(dx,dy,5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1a3a2a';ctx.font='bold 9px -apple-system';ctx.textAlign='center';ctx.fillText(obs.frelon,dx,dy-8);
+  });
+  if(observations.length>=2){
+    const v=meanVec();
+    const rad=(v.dir-90)*Math.PI/180;
+    const dp=Math.min((v.ms/2000)*5,W*0.44*.95);
+    const nx=cx+Math.cos(rad)*dp,ny=cy+Math.sin(rad)*dp;
+    ctx.strokeStyle='rgba(217,64,64,.6)';ctx.lineWidth=2;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.arc(nx,ny,20,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle='#d94040';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(nx-12,ny);ctx.lineTo(nx+12,ny);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(nx,ny-12);ctx.lineTo(nx,ny+12);ctx.stroke();
+    ctx.fillStyle='#d94040';ctx.font='bold 10px -apple-system';ctx.textAlign='center';ctx.fillText('Nid ?',nx,ny+30);
+  }
+  goto_draw_origin(ctx,cx,cy);
+  // mini compass
+  const cr=18,cmx=W-cr-8,cmy=cr+8;
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(cmx,cmy,cr,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#1a3a2a';ctx.lineWidth=1;ctx.beginPath();ctx.arc(cmx,cmy,cr,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='#d94040';ctx.beginPath();ctx.moveTo(cmx,cmy-cr+4);ctx.lineTo(cmx-4,cmy);ctx.lineTo(cmx+4,cmy);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#1a3a2a';ctx.beginPath();ctx.moveTo(cmx,cmy+cr-4);ctx.lineTo(cmx-4,cmy);ctx.lineTo(cmx+4,cmy);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#d94040';ctx.font='bold 8px -apple-system';ctx.textAlign='center';ctx.fillText('N',cmx,cmy-cr-2);
+}
+function goto_draw_origin(ctx,cx,cy){
+  ctx.fillStyle='#1a3a2a';ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='white';ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#1a3a2a';ctx.font='bold 10px -apple-system';ctx.textAlign='center';ctx.fillText('Vous',cx,cy+19);
+}
+
+// OBS
+function renderObs(){
+  const el=document.getElementById('obs-list');
+  if(!observations.length){el.innerHTML='<div class="empty"><div class="empty-i">📭</div><p>Aucune observation</p></div>';return;}
+  el.innerHTML=observations.slice().reverse().map((o,i)=>`
+    <div class="obs-item">
+      <div class="onum">${observations.length-i}</div>
+      <div class="oinfo">
+        <div class="odir"><span class="ftag" style="background:${o.color||'#e8a020'}">${o.frelon}</span>${o.direction}° ${dirNm(o.direction)}</div>
+        <div class="ometa">⏱ ${fmtMsLong(o.timeMs)} · ~${distM(o.timeMs)}m · ${new Date(o.timestamp).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <div class="odel" onclick="delObs(${o.id})">✕</div>
+    </div>`).join('');
+}
+function delObs(id){observations=observations.filter(o=>o.id!==id);localStorage.setItem('fo2',JSON.stringify(observations));renderObs();}
+function clearAll(){if(confirm('Effacer toutes les observations ?')){observations=[];localStorage.removeItem('fo2');renderObs();drawMap();updateStats();toast('Tout effacé');}}
+function exportCSV(){
+  if(!observations.length){toast('Aucune donnée');return;}
+  const h='Frelon,Direction,Temps_ms,Temps,Distance_m,Lat,Lng,Heure\n';
+  const r=observations.map(o=>`${o.frelon},${o.direction},${o.timeMs},${fmtMsLong(o.timeMs)},${distM(o.timeMs)},${o.pos?.lat||''},${o.pos?.lng||''},${o.timestamp}`).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([h+r],{type:'text/csv'})),download:'frelons.csv'});a.click();
+}
+
+// STATS
+function meanVec(){
+  let sc=0,cc=0,tm=0;
+  observations.forEach(o=>{const r=o.direction*Math.PI/180;sc+=Math.sin(r);cc+=Math.cos(r);tm+=o.timeMs;});
+  const n=observations.length;
+  return{dir:((Math.atan2(sc/n,cc/n)*180/Math.PI)+360)%360,ms:tm/n};
+}
+function updateStats(){
+  const n=observations.length;
+  document.getElementById('st-n').textContent=n;
+  if(!n){['st-t','st-d','st-dist'].forEach(id=>document.getElementById(id).textContent='—');
+    document.getElementById('st-est').textContent='Pas assez de données';
+    document.getElementById('st-sub').textContent='3 observations minimum';return;}
+  const avg=observations.reduce((s,o)=>s+o.timeMs,0)/n;
+  document.getElementById('st-t').textContent=fmtMs(avg);
+  const v=meanVec();
+  document.getElementById('st-d').textContent=Math.round(v.dir)+'°';
+  const dm=distM(v.ms);
+  document.getElementById('st-dist').textContent=dm>=1000?`${(dm/1000).toFixed(1)}km`:dm+'m';
+  if(n>=3){
+    document.getElementById('st-est').textContent=`${Math.round(v.dir)}° ${dirNm(Math.round(v.dir))}`;
+    document.getElementById('st-sub').textContent=`~${dm}m · ${n} individus · ±${Math.round(dm*.25)}m d'incertitude`;
+  }else{document.getElementById('st-est').textContent=`Encore ${3-n} obs. requises`;document.getElementById('st-sub').textContent='Pour une estimation fiable';}
+}
+
+// TOAST
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
+
+// INIT
+initGPS(); initCompass(); updateRefDisp(); renderSlots();
+</script>
+</body>
+</html>
