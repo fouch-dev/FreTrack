@@ -332,13 +332,13 @@ function renderSlots() {
 
     let ctrlHtml='';
     if(s.state==='idle')       ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Départ</button>`;
-    else if(s.state==='running') ctrlHtml=`<button class="sc sc-stop" onclick="stopSlot(${s.id})">⏹ Stop</button>`;
-    else if(s.state==='done')   ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Reprendre</button><button class="sc sc-rec" onclick="goDir(${s.id})">🧭 Direction</button>`;
+    else if(s.state==='running') ctrlHtml=`<button class="sc sc-stop" onclick="stopSlot(${s.id})">⏹ Stop</button><button class="sc sc-rec" onclick="goDir(${s.id})">🧭 Dir.</button>`;
+    else if(s.state==='done')   ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Reprendre</button><button class="sc sc-rec" onclick="goDir(${s.id})">🧭 Dir.</button>`;
     else if(s.state==='recorded') ctrlHtml=`<button class="sc sc-go" onclick="reuse(${s.id})">↺ Réutiliser</button>`;
 
     const rstHtml=s.state!=='idle'?`<button class="sc sc-rst" onclick="resetSlot(${s.id})">↺</button>`:'';
 
-    const stTxt=s.state==='running'?'● En vol...'
+    const stTxt=s.state==='running'?'● En vol — stoppez à son retour, ou enregistrez la direction maintenant'
       :s.state==='done'?'✓ De retour — allez sur Boussole pour la direction'
       :s.state==='recorded'?'✅ Direction enregistrée'
       :'En attente';
@@ -394,15 +394,20 @@ function reuse(id) {
 function renderAssign() {
   const el=document.getElementById('assign-list');
   const waiting=slots.filter(s=>s.state==='done'||s.state==='running');
-  if(!waiting.length){el.innerHTML='<div class="empty" style="padding:8px">Aucun frelon stoppé en attente.<br>Stoppez un chrono sur l\'onglet Suivi.</div>';return;}
-  el.innerHTML=waiting.map(s=>`
+  if(!waiting.length){el.innerHTML='<div class="empty" style="padding:8px">Aucun frelon en vol ou stoppé.<br>Démarrez un chrono sur l\'onglet Suivi.</div>';return;}
+  el.innerHTML=waiting.map(s=>{
+    const ms=s.state==='running'?(Date.now()-s.start):s.elapsed;
+    const badge=s.state==='running'
+      ?'<span style="font-size:9px;background:var(--g-light);color:white;padding:2px 6px;border-radius:10px;margin-left:4px">EN VOL</span>'
+      :'<span style="font-size:9px;background:var(--amber);color:white;padding:2px 6px;border-radius:10px;margin-left:4px">STOPPÉ</span>';
+    return `
     <div class="assign-row" onclick="assignDir(${s.id})">
-      <div class="scdot" style="background:${s.color};width:14px;height:14px;border-radius:50%"></div>
-      <div class="assign-nm">${s.name}</div>
-      <div class="assign-t">${fmtMs(s.state==='running'?Date.now()-s.start:s.elapsed)}</div>
+      <div class="scdot" style="background:${s.color};width:14px;height:14px;border-radius:50%;flex-shrink:0"></div>
+      <div class="assign-nm">${s.name}${badge}</div>
+      <div class="assign-t">${fmtMs(ms)}</div>
       <div class="assign-d">${currentHeading!==null?currentHeading+'°':'?°'} →</div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 function assignDir(slotId) {
   const s=slots.find(x=>x.id===slotId);
@@ -413,9 +418,12 @@ function assignDir(slotId) {
   const obs={id:Date.now(),frelon:s.name,color:s.color,direction:currentHeading,timeMs:ms,pos:currentPos?{...currentPos}:null,timestamp:new Date().toISOString()};
   observations.push(obs);
   localStorage.setItem('fo2',JSON.stringify(observations));
-  clearInterval(s.iv); s.elapsed=ms; s.state='recorded';
-  renderSlots(); renderAssign();
-  toast(`✓ ${s.name} · ${currentHeading}° · ${fmtMs(ms)}`);
+  // Si le frelon est encore en vol : on enregistre juste la direction, le chrono continue
+  // Si le frelon est stoppé (done) : on marque comme recorded
+  if(s.state==='done') { s.state='recorded'; renderSlots(); }
+  renderAssign();
+  const enVol = s.state==='running' ? ' (chrono continue ▶)' : '';
+  toast(`✓ ${s.name} · ${currentHeading}° · ${fmtMs(ms)}${enVol}`);
 }
 // Keep assign list live
 setInterval(()=>{if(document.getElementById('page-compass').classList.contains('on'))renderAssign();},300);
