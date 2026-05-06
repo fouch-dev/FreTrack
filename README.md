@@ -23,7 +23,8 @@ En combinant plusieurs observations, l'application triangule une **zone de reche
 
 1. Ouvrez l'URL de ce projet dans **Chrome sur Android** https://fouch-dev.github.io/FreTrack/
 2. Appuyez sur le menu ⋮ → **"Ajouter à l'écran d'accueil"**
-3. Confirmez — FreTrack apparaît comme une vraie application
+3. Choisir l'option ⋮ → **Installer** 
+4. Confirmez — FreTrack apparaît comme une vraie application
 
 > ✅ Fonctionne hors-ligne une fois installée (sauf le chargement des tuiles de carte)
 
