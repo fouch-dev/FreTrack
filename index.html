@@ -320,7 +320,7 @@ function askPerm() {
 }
 // Filtre passe-bas boussole
 // ALPHA 0.15 = lissage fort (~20 mesures), suffisamment réactif sur le terrain
-const COMPASS_ALPHA = 0.07;
+const COMPASS_ALPHA = 0.03;
 let _ssin = null, _scos = null;
 
 function onOrient(e) {
@@ -353,8 +353,8 @@ let _stableCount = 0; // compteur de frames consécutives stables
 
 function updateStabilityIndicator(smoothed) {
   _headingHistory.push(smoothed);
-  if (_headingHistory.length > 20) _headingHistory.shift();
-  if (_headingHistory.length < 8) return;
+  if (_headingHistory.length > 30) _headingHistory.shift();
+  if (_headingHistory.length < 12) return;
 
   // Longueur du vecteur moyen circulaire (R proche de 1 = stable)
   let ss = 0, sc = 0;
@@ -378,7 +378,7 @@ function updateStabilityIndicator(smoothed) {
 
   const indicator = document.getElementById('stab-indicator');
   // Vert : vecteur très cohérent ET variation max < 8° sur les 6 dernières valeurs
-  if (R > 0.97 && maxDiff < 8) {
+  if (R > 0.96 && maxDiff < 10) {
     _stableCount++;
     dot.style.background = '#4ade80';
     txt.textContent = '✓ Stable — prêt à enregistrer';
@@ -388,7 +388,7 @@ function updateStabilityIndicator(smoothed) {
     document.querySelectorAll('.assign-row:not(.used)').forEach(r => { r.style.opacity='1'; r.style.pointerEvents='auto'; });
   }
   // Jaune
-  else if (R > 0.92 && maxDiff < 18) {
+  else if (R > 0.88 && maxDiff < 20) {
     _stableCount = 0;
     dot.style.background = '#facc15';
     txt.textContent = 'Presque stable...';
