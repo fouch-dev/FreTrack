@@ -2,7 +2,7 @@
 
 > Application mobile PWA pour apiculteurs — triangulation de nids de *Vespa velutina* sur le terrain
 
-![Licence](https://img.shields.io/badge/licence-AGPLV3-green) ![PWA](https://img.shields.io/badge/PWA-ready-4a9e68) ![OpenStreetMap](https://img.shields.io/badge/carte-OpenStreetMap-blue) ![Sans clé API](https://img.shields.io/badge/API_key-aucune-brightgreen)
+![Licence](https://img.shields.io/badge/licence-AGPL V3-red) ![PWA](https://img.shields.io/badge/PWA-ready-4a9e68) ![OpenStreetMap](https://img.shields.io/badge/carte-OpenStreetMap-blue) ![Sans clé API](https://img.shields.io/badge/API_key-aucune-brightgreen)
 
 ---
 
@@ -103,7 +103,7 @@ Les suggestions sont les bienvenues ! Idées en cours :
 
 ## 📜 Licence
 
-AGPL V3
+Tout le code est sous licence AGPL V3
 
 ---
 
