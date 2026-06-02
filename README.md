@@ -108,6 +108,6 @@ Tout le code est sous licence AGPL V3
 ---
 
 <div align="center">
-  <sub>Fait avec ❤️ par un apiculteur, pour les apiculteurs et avec l'aide de Claude.ai.<br>
+  <sub>Fait avec ❤️ par un apiculteur amateur, pour les apiculteurs et avec l'aide de Claude.ai.<br>
   <i>Protégeons nos abeilles.</i> 🍯</sub>
 </div>
