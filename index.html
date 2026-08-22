@@ -35,7 +35,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 .page.on { display:block; }
 .card { background:var(--card); border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:var(--shadow); border:1px solid var(--border); }
 .card-ttl { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
-
+ 
 /* SLOTS */
 .slots-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .add-btn { display:flex; align-items:center; gap:5px; padding:7px 14px; border:none; border-radius:20px; background:var(--g-mid); color:white; font-size:13px; font-weight:700; cursor:pointer; }
@@ -59,7 +59,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 .sc-rec { background:var(--amber); color:white; }
 .sc-del { background:#f0e8e8; color:var(--red); max-width:44px; }
 .slot-st { font-size:10px; padding:2px 8px 10px 13px; color:var(--muted); background:var(--card); }
-
+ 
 /* COMPASS */
 .cmp-wrap { position:relative; width:200px; height:200px; margin:0 auto 12px; }
 .cring { width:200px; height:200px; border-radius:50%; border:3px solid var(--g-dark); background:radial-gradient(circle,#f9f6ee,#ede8da); box-shadow:0 4px 16px rgba(0,0,0,.2),inset 0 1px 3px rgba(255,255,255,.8); position:relative; overflow:visible; }
@@ -79,13 +79,13 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 .assign-nm { flex:1; font-size:14px; font-weight:700; }
 .assign-t { font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
 .assign-d { font-size:14px; color:var(--g-mid); font-weight:700; min-width:44px; text-align:right; }
-
+ 
 /* MAP */
 #map-canvas { display:block; width:100%; border-radius:12px; }
 .legend { display:flex; gap:10px; flex-wrap:wrap; margin-top:7px; }
 .li { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--muted); }
 .ld { width:9px; height:9px; border-radius:50%; }
-
+ 
 /* OBS */
 .obs-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
 .obs-item:last-child { border-bottom:none; }
@@ -95,7 +95,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 .ometa { font-size:11px; color:var(--muted); margin-top:1px; }
 .odel { font-size:19px; color:var(--red); padding:4px; cursor:pointer; }
 .ftag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px; color:white; font-size:11px; font-weight:700; margin-right:4px; }
-
+ 
 /* STATS */
 .sg { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:10px; }
 .sb { background:var(--card); border-radius:12px; padding:13px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; }
@@ -105,7 +105,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 .et { font-size:11px; color:var(--g-pale); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
 .ev { font-size:17px; font-weight:700; margin-bottom:2px; }
 .es { font-size:12px; color:var(--g-pale); }
-
+ 
 .btn { flex:1; padding:13px; border:none; border-radius:11px; font-size:14px; font-weight:700; cursor:pointer; transition:all .15s; }
 .btn:active { transform:scale(.97); }
 .bp { background:var(--g-mid); color:white; }
@@ -119,13 +119,13 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
 </style>
 </head>
 <body>
-
+ 
 <header>
   <span style="font-size:22px">🐝</span>
   <div style="flex:1"><div class="sub">Triangulation frelons</div><h1>FreTrack</h1></div>
   <div class="gps-pill"><div class="dot" id="gps-dot"></div><span id="gps-txt">GPS</span></div>
 </header>
-
+ 
 <div class="tabs">
   <div class="tab on" onclick="sw('track')" id="tab-track"><i>⏱</i>Suivi</div>
   <div class="tab" onclick="sw('compass')" id="tab-compass"><i>🧭</i>Direction</div>
@@ -133,7 +133,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
   <div class="tab" onclick="sw('obs')" id="tab-obs"><i>📋</i>Obs.</div>
   <div class="tab" onclick="sw('stats')" id="tab-stats"><i>📊</i>Analyse</div>
 </div>
-
+ 
 <!-- SUIVI -->
 <div class="page on" id="page-track">
   <div class="card">
@@ -151,7 +151,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
     💡 <strong>Workflow multi-frelons :</strong> Créez un slot par frelon marqué. Démarrez chaque chrono au départ du frelon, stoppez-le à son retour. Ensuite allez sur <strong>Direction</strong> pour enregistrer l'azimut de chacun.
   </div>
 </div>
-
+ 
 <!-- DIRECTION -->
 <div class="page" id="page-compass">
   <div class="card" style="text-align:center">
@@ -182,13 +182,13 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
       </div>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="card-ttl">Appuyez sur un frelon pour enregistrer sa direction</div>
     <div id="assign-list"><div class="empty" style="padding:8px">Aucun frelon stoppé</div></div>
   </div>
 </div>
-
+ 
 <!-- CARTE -->
 <div class="page" id="page-map">
   <div style="display:flex;gap:8px;margin-bottom:10px">
@@ -203,7 +203,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
     <div class="li"><div class="ld" style="background:#d94040"></div>Nid estimé</div>
   </div>
 </div>
-
+ 
 <!-- OBS -->
 <div class="page" id="page-obs">
   <div class="card">
@@ -215,7 +215,7 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
     <button class="btn bd" onclick="clearAll()">🗑 Effacer</button>
   </div>
 </div>
-
+ 
 <!-- STATS -->
 <div class="page" id="page-stats">
   <div class="sg">
@@ -237,9 +237,18 @@ header h1 { font-size:17px; font-weight:700; flex:1; }
     </div>
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
+<!-- Modal choix couleur -->
+<div id="color-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:flex-end;justify-content:center">
+  <div style="background:white;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px">
+    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;text-align:center">Choisir la couleur du frelon</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px" id="color-grid"></div>
+    <button onclick="document.getElementById('color-picker-modal').style.display='none'" style="width:100%;padding:12px;border:none;border-radius:12px;background:#e8e0d0;font-size:14px;font-weight:700;cursor:pointer">Annuler</button>
+  </div>
+</div>
+ 
 <script>
 // STATE
 let slots = [];
@@ -256,7 +265,7 @@ const FRELONS = [
   { name: 'Vert',   color: '#2d6b45' },
   { name: 'Orange', color: '#e8610a' },
 ];
-
+ 
 // TABS
 function sw(t) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
@@ -271,7 +280,7 @@ function sw(t) {
   if(t==='obs') renderObs();
   if(t==='compass') renderAssign();
 }
-
+ 
 // GPS
 function initGPS() {
   if(!navigator.geolocation) return;
@@ -296,7 +305,7 @@ function updateRefDisp() {
   // Si la carte est visible, on la redessine
   if (leafletMap && document.getElementById('page-map').classList.contains('on')) drawMap();
 }
-
+ 
 // COMPASS
 function initCompass() {
   if(!window.DeviceOrientationEvent) return;
@@ -322,13 +331,13 @@ function askPerm() {
 // ALPHA 0.15 = lissage fort (~20 mesures), suffisamment réactif sur le terrain
 const COMPASS_ALPHA = 0.03;
 let _ssin = null, _scos = null;
-
+ 
 function onOrient(e) {
   let h = null;
   if (e.webkitCompassHeading !== undefined) h = e.webkitCompassHeading;
   else if (e.alpha !== null) h = (360 - e.alpha + 360) % 360;
   if (h === null) return;
-
+ 
   // Filtrage en sin/cos pour éviter le bug de wrap 359°→1°
   const rad = h * Math.PI / 180;
   if (_ssin === null) { _ssin = Math.sin(rad); _scos = Math.cos(rad); }
@@ -338,30 +347,30 @@ function onOrient(e) {
   }
   const smoothed = ((Math.atan2(_ssin, _scos) * 180 / Math.PI) + 360) % 360;
   currentHeading = Math.round(smoothed);
-
+ 
   const rose = document.getElementById('crose');
   if (rose) rose.style.transform = `rotate(${-smoothed}deg)`;
   document.getElementById('deg-val').textContent = currentHeading + '°';
   document.getElementById('deg-nm').textContent = dirNm(currentHeading);
   updateStabilityIndicator(smoothed);
 }
-
+ 
 // Indicateur de stabilité : mesure la variance sur les 8 dernières valeurs
 // Historique des angles lissés pour mesurer la stabilité
 const _headingHistory = [];
 let _stableCount = 0; // compteur de frames consécutives stables
-
+ 
 function updateStabilityIndicator(smoothed) {
   _headingHistory.push(smoothed);
   if (_headingHistory.length > 30) _headingHistory.shift();
   if (_headingHistory.length < 12) return;
-
+ 
   // Longueur du vecteur moyen circulaire (R proche de 1 = stable)
   let ss = 0, sc = 0;
   _headingHistory.forEach(a => { ss += Math.sin(a*Math.PI/180); sc += Math.cos(a*Math.PI/180); });
   const n = _headingHistory.length;
   const R = Math.sqrt(ss*ss + sc*sc) / n;
-
+ 
   // Variation max entre les dernières valeurs (écart min/max circulaire)
   const recent = _headingHistory.slice(-6);
   let maxDiff = 0;
@@ -371,11 +380,11 @@ function updateStabilityIndicator(smoothed) {
       if (d > 180) d = 360 - d;
       if (d > maxDiff) maxDiff = d;
     }
-
+ 
   const dot = document.getElementById('stab-dot');
   const txt = document.getElementById('stab-txt');
   if (!dot) return;
-
+ 
   const indicator = document.getElementById('stab-indicator');
   // Vert : vecteur très cohérent ET variation max < 8° sur les 6 dernières valeurs
   if (R > 0.96 && maxDiff < 10) {
@@ -407,16 +416,21 @@ function updateStabilityIndicator(smoothed) {
   }
 }
 function dirNm(d){return['Nord','Nord-Est','Est','Sud-Est','Sud','Sud-Ouest','Ouest','Nord-Ouest'][Math.round(d/45)%8];}
-
+ 
 // SLOTS
 function addSlot() {
-  const f = FRELONS[slotCnt % FRELONS.length];
-  slotCnt++;
-  slots.push({ id: Date.now(), name: f.name, color: f.color, state:'idle', start:0, elapsed:0, iv:null });
+  // Afficher le picker de couleur
+  document.getElementById('color-picker-modal').style.display = 'flex';
+}
+ 
+function pickColor(idx) {
+  const f = FRELONS[idx];
+  document.getElementById('color-picker-modal').style.display = 'none';
+  slots.push({ id: Date.now(), name: f.name, color: f.color, state:'idle', start:0, elapsed:0, iv:null, lastDir: undefined });
   document.getElementById('slots-empty').style.display = 'none';
   renderSlots();
 }
-
+ 
 function renderSlots() {
   const c=document.getElementById('slots-container');
   c.innerHTML='';
@@ -425,20 +439,25 @@ function renderSlots() {
     const div=document.createElement('div');
     div.className='slot '+(s.state==='running'?'running':s.state==='done'?'done':s.state==='recorded'?'recorded':'');
     div.id='slot-'+s.id;
-
+ 
     let ctrlHtml='';
     if(s.state==='idle')       ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Départ</button>`;
     else if(s.state==='running') ctrlHtml=`<button class="sc sc-stop" onclick="stopSlot(${s.id})">⏹ Stop</button><button class="sc sc-rec" onclick="goDir(${s.id})">🧭 Dir.</button>`;
     else if(s.state==='done')   ctrlHtml=`<button class="sc sc-go" onclick="startSlot(${s.id})">▶ Reprendre</button><button class="sc sc-rec" onclick="goDir(${s.id})">🧭 Dir.</button>`;
     else if(s.state==='recorded') ctrlHtml=`<button class="sc sc-go" onclick="reuse(${s.id})">↺ Réutiliser</button>`;
-
+ 
     const rstHtml=s.state!=='idle'?`<button class="sc sc-rst" onclick="resetSlot(${s.id})">↺</button>`:'';
-
-    const stTxt=s.state==='running'?'● En vol — stoppez à son retour, ou enregistrez la direction maintenant'
-      :s.state==='done'?'✓ De retour — allez sur Boussole pour la direction'
-      :s.state==='recorded'?'✅ Direction enregistrée'
-      :'En attente';
-
+ 
+    const dirBadge = s.lastDir !== undefined
+      ? `<span style="background:#2d6b45;color:white;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px">🧭 ${s.lastDir}°</span>` : '';
+    const stTxt = s.state==='running'
+      ? `● En vol${dirBadge}`
+      : s.state==='done'
+      ? `✓ De retour — enregistrez la direction${dirBadge}`
+      : s.state==='recorded'
+      ? `✅ Enregistré${dirBadge}`
+      : 'En attente';
+ 
     div.innerHTML=`
       <div class="slot-hd">
         <div class="scdot" style="background:${s.color}"></div>
@@ -451,7 +470,7 @@ function renderSlots() {
   });
   document.getElementById('slots-empty').style.display=slots.length===0?'block':'none';
 }
-
+ 
 function startSlot(id) {
   const s=slots.find(x=>x.id===id);
   if(!s) return;
@@ -485,7 +504,7 @@ function reuse(id) {
   if(!s) return;
   clearInterval(s.iv); s.elapsed=0; s.state='idle'; renderSlots();
 }
-
+ 
 // ASSIGN DIRECTION
 function renderAssign() {
   const el=document.getElementById('assign-list');
@@ -506,24 +525,53 @@ function renderAssign() {
   }).join('');
 }
 function assignDir(slotId) {
-  const s=slots.find(x=>x.id===slotId);
-  if(!s) return;
-  if(currentHeading===null){toast('Boussole non disponible !');return;}
-  const ms=s.state==='running'?(Date.now()-s.start):s.elapsed;
-  if(ms<500){toast('Chrono trop court !');return;}
-  const obs={id:Date.now(),frelon:s.name,color:s.color,direction:currentHeading,timeMs:ms,pos:currentPos?{...currentPos}:null,timestamp:new Date().toISOString()};
-  observations.push(obs);
-  localStorage.setItem('fo2',JSON.stringify(observations));
-  // Si le frelon est encore en vol : on enregistre juste la direction, le chrono continue
-  // Si le frelon est stoppé (done) : on marque comme recorded
-  if(s.state==='done') { s.state='recorded'; renderSlots(); }
+  const s = slots.find(x => x.id === slotId);
+  if (!s) return;
+  if (currentHeading === null) { toast('Boussole non disponible !'); return; }
+  const ms = s.state === 'running' ? (Date.now() - s.start) : s.elapsed;
+  if (ms < 500) { toast('Chrono trop court !'); return; }
+ 
+  if (s.state === 'running') {
+    // EN VOL : on met à jour l'obs existante du slot (ou on en crée une si c'est la première)
+    const existing = observations.find(o => o.slotId === s.id && o.inFlight);
+    if (existing) {
+      // Mise à jour de la direction sans créer de nouvelle trace
+      existing.direction = currentHeading;
+      existing.timeMs = ms;
+      existing.timestamp = new Date().toISOString();
+    } else {
+      observations.push({ id: Date.now(), slotId: s.id, inFlight: true,
+        frelon: s.name, color: s.color, direction: currentHeading,
+        timeMs: ms, pos: currentPos ? {...currentPos} : null,
+        timestamp: new Date().toISOString() });
+    }
+    s.lastDir = currentHeading; // mémoriser pour affichage icône
+    renderSlots();
+    toast(`🧭 ${s.name} · ${currentHeading}° mis à jour (chrono continue ▶)`);
+  } else {
+    // STOPPÉ : finaliser l'obs (marquer inFlight=false, ou créer si pas de direction en vol)
+    const existing = observations.find(o => o.slotId === s.id && o.inFlight);
+    if (existing) {
+      existing.inFlight = false;
+      existing.direction = currentHeading;
+      existing.timeMs = ms;
+    } else {
+      observations.push({ id: Date.now(), slotId: s.id, inFlight: false,
+        frelon: s.name, color: s.color, direction: currentHeading,
+        timeMs: ms, pos: currentPos ? {...currentPos} : null,
+        timestamp: new Date().toISOString() });
+    }
+    s.lastDir = currentHeading;
+    s.state = 'recorded';
+    renderSlots();
+    toast(`✓ ${s.name} · ${currentHeading}° · ${fmtMs(ms)} enregistré`);
+  }
+  localStorage.setItem('fo2', JSON.stringify(observations));
   renderAssign();
-  const enVol = s.state==='running' ? ' (chrono continue ▶)' : '';
-  toast(`✓ ${s.name} · ${currentHeading}° · ${fmtMs(ms)}${enVol}`);
 }
 // Keep assign list live
 setInterval(()=>{if(document.getElementById('page-compass').classList.contains('on'))renderAssign();},300);
-
+ 
 // FORMAT
 function fmtMs(ms){
   if(!ms||ms<0) return'0.0s';
@@ -532,11 +580,11 @@ function fmtMs(ms){
 }
 function fmtMsLong(ms){const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000);return m>0?`${m}m ${s}s`:`${s}s`;}
 function distM(ms){return Math.round((ms/1000/2)*2.22);}
-
+ 
 // MAP — Leaflet / OpenStreetMap
 let leafletMap = null;
 let mapLayers = { origin: null, rays: [], distDots: [], estimate: null, estimateCircle: null };
-
+ 
 function initLeafletMap() {
   if (leafletMap) return;
   const center = refPos ? [refPos.lat, refPos.lng] : [46.5, 2.5]; // France par défaut
@@ -547,14 +595,14 @@ function initLeafletMap() {
     maxZoom: 19
   }).addTo(leafletMap);
 }
-
+ 
 function drawMap() {
   initLeafletMap();
   clearMapLayers();
-
+ 
   const origin = refPos || currentPos;
   if (!origin) return;
-
+ 
   // Marqueur position d'observation
   const youIcon = L.divIcon({
     html: `<div style="width:16px;height:16px;border-radius:50%;background:#1a3a2a;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`,
@@ -562,62 +610,85 @@ function drawMap() {
   });
   mapLayers.origin = L.marker([origin.lat, origin.lng], { icon: youIcon })
     .bindPopup('<b>Votre position</b>').addTo(leafletMap);
-
+ 
   if (!observations.length) {
     leafletMap.setView([origin.lat, origin.lng], 16);
     return;
   }
-
+ 
   const bounds = [[origin.lat, origin.lng]];
-
-  observations.forEach(obs => {
-    // Calcul du point de distance estimée
-    const distM = Math.round((obs.timeMs / 1000 / 2) * 2.22);
-    // Point de demi-tour estimé
-    const endPt = destPoint(origin.lat, origin.lng, obs.direction, distM);
-    // Extrémité du rayon : on projette loin (5 km) pour aller jusqu'au bord de la carte
+ 
+  // Grouper par slotId : ne garder qu'une observation par slot (la plus récente)
+  const obsToShow = [];
+  const seen = new Set();
+  [...observations].reverse().forEach(obs => {
+    const key = obs.slotId || obs.id;
+    if (!seen.has(key)) { seen.add(key); obsToShow.push(obs); }
+  });
+ 
+  obsToShow.forEach(obs => {
+    const dM = Math.round((obs.timeMs / 1000 / 2) * 2.22);
+    const endPt = destPoint(origin.lat, origin.lng, obs.direction, dM);
     const farPt = destPoint(origin.lat, origin.lng, obs.direction, 5000);
-
-    // Segment 1 : origine → point de demi-tour (trait plein, plus épais)
+    const col = obs.color || '#e8a020';
+    const provisional = obs.inFlight; // direction prise en vol, pas encore finalisée
+ 
+    // Segment plein : origine → demi-tour
     const rayNear = L.polyline([[origin.lat, origin.lng], [endPt.lat, endPt.lng]], {
-      color: obs.color || '#e8a020', weight: 3, opacity: 0.9
+      color: col, weight: provisional ? 2 : 3, opacity: provisional ? 0.6 : 0.9,
+      dashArray: provisional ? '4,4' : null
     }).addTo(leafletMap);
-    rayNear.bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° · ~${distM}m`);
+    rayNear.bindPopup(`<b>${obs.frelon}</b>${provisional?' (en vol)':''}<br>${obs.direction}° · ~${dM}m`);
     mapLayers.rays.push(rayNear);
-
-    // Segment 2 : point de demi-tour → bord de carte (pointillé fin)
+ 
+    // Segment pointillé : demi-tour → bord carte
     const rayFar = L.polyline([[endPt.lat, endPt.lng], [farPt.lat, farPt.lng]], {
-      color: obs.color || '#e8a020', weight: 1.5, opacity: 0.45, dashArray: '6,7'
+      color: col, weight: 1.5, opacity: provisional ? 0.25 : 0.45, dashArray: '6,7'
     }).addTo(leafletMap);
-    rayFar.bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° · ~${distM}m`);
     mapLayers.rays.push(rayFar);
-
-    // Point distance estimée
-    const dotIcon = L.divIcon({
-      html: `<div style="width:10px;height:10px;border-radius:50%;background:${obs.color||'#e8a020'};border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
-             <div style="font-size:9px;font-weight:700;color:#1a3a2a;white-space:nowrap;margin-top:1px;text-shadow:0 0 3px white">${obs.frelon}</div>`,
-      iconSize: [10, 10], iconAnchor: [5, 5], className: ''
-    });
-    const dot = L.marker([endPt.lat, endPt.lng], { icon: dotIcon })
-      .bindPopup(`<b>${obs.frelon}</b><br>${obs.direction}° ${dirNm(obs.direction)}<br>Temps : ${fmtMsLong(obs.timeMs)}<br>Distance estimée : ~${distM}m`)
+ 
+    // Point de demi-tour avec icône différente si provisional
+    const dotHtml = provisional
+      ? `<div style="width:12px;height:12px;border-radius:50%;background:white;border:3px solid ${col};box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+         <div style="font-size:9px;font-weight:700;color:#1a3a2a;white-space:nowrap;margin-top:1px;text-shadow:0 0 3px white">${obs.frelon} ✈</div>`
+      : `<div style="width:12px;height:12px;border-radius:50%;background:${col};border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+         <div style="font-size:9px;font-weight:700;color:#1a3a2a;white-space:nowrap;margin-top:1px;text-shadow:0 0 3px white">${obs.frelon}</div>`;
+    const dotIcon = L.divIcon({ html: dotHtml, iconSize:[12,12], iconAnchor:[6,6], className:'' });
+ 
+    // Marqueur draggable pour réajuster la direction manuellement
+    const dot = L.marker([endPt.lat, endPt.lng], { icon: dotIcon, draggable: true })
+      .bindPopup(`<b>${obs.frelon}</b>${provisional?' ✈ en vol':''}<br>${obs.direction}° ${dirNm(obs.direction)}<br>Temps : ${fmtMsLong(obs.timeMs)}<br>Distance : ~${dM}m<br><i style="font-size:10px;color:#888">Glissez pour ajuster la direction</i>`)
       .addTo(leafletMap);
+ 
+    // Drag : recalcule l'azimut depuis origin vers la nouvelle position
+    dot.on('dragend', e => {
+      const newLatLng = e.target.getLatLng();
+      const newBearing = bearing(origin.lat, origin.lng, newLatLng.lat, newLatLng.lng);
+      const newDist = haversineDist(origin.lat, origin.lng, newLatLng.lat, newLatLng.lng);
+      obs.direction = Math.round(newBearing);
+      obs.timeMs = Math.round((newDist / 2.22) * 2 * 1000); // back-calculer le temps
+      localStorage.setItem('fo2', JSON.stringify(observations));
+      drawMap(); // redessiner
+      toast(`🧭 ${obs.frelon} ajusté → ${obs.direction}°`);
+    });
+ 
     mapLayers.distDots.push(dot);
     bounds.push([endPt.lat, endPt.lng]);
   });
-
+ 
   // Zone estimée (moyenne vectorielle)
   if (observations.length >= 2) {
     const v = meanVec();
     const dm = Math.round((v.ms / 1000 / 2) * 2.22);
     const estPt = destPoint(origin.lat, origin.lng, v.dir, dm);
     bounds.push([estPt.lat, estPt.lng]);
-
+ 
     // Cercle d'incertitude
     mapLayers.estimateCircle = L.circle([estPt.lat, estPt.lng], {
       radius: Math.max(dm * 0.25, 10),
       color: '#d94040', fillColor: '#d94040', fillOpacity: 0.15, weight: 2, dashArray: '5,4'
     }).addTo(leafletMap);
-
+ 
     // Marqueur nid estimé
     const nestIcon = L.divIcon({
       html: `<div style="background:#d94040;color:white;font-size:11px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)">🐝 Nid ?</div>`,
@@ -627,12 +698,12 @@ function drawMap() {
       .bindPopup(`<b>Nid estimé</b><br>Direction : ${Math.round(v.dir)}° ${dirNm(Math.round(v.dir))}<br>Distance : ~${dm}m<br>Incertitude : ±${Math.round(dm*.25)}m`)
       .addTo(leafletMap);
   }
-
+ 
   // Ajustement de la vue
   if (bounds.length > 1) leafletMap.fitBounds(bounds, { padding: [30, 30] });
   else leafletMap.setView([origin.lat, origin.lng], 16);
 }
-
+ 
 function clearMapLayers() {
   if (!leafletMap) return;
   if (mapLayers.origin) leafletMap.removeLayer(mapLayers.origin);
@@ -642,26 +713,40 @@ function clearMapLayers() {
   if (mapLayers.estimateCircle) leafletMap.removeLayer(mapLayers.estimateCircle);
   mapLayers = { origin: null, rays: [], distDots: [], estimate: null, estimateCircle: null };
 }
-
+ 
 function centerMap() {
   if (!leafletMap) return;
   const c = refPos || currentPos;
   if (c) leafletMap.setView([c.lat, c.lng], 16);
   else toast('GPS non disponible');
 }
-
-// Calcul d'un point à distance+azimut depuis lat/lng (formule haversine inverse)
+ 
+// Point à distance+azimut (haversine inverse)
 function destPoint(lat, lng, bearingDeg, distM) {
-  const R = 6371000;
-  const d = distM / R;
-  const b = bearingDeg * Math.PI / 180;
-  const lat1 = lat * Math.PI / 180;
-  const lng1 = lng * Math.PI / 180;
+  const R = 6371000, d = distM / R, b = bearingDeg * Math.PI / 180;
+  const lat1 = lat * Math.PI / 180, lng1 = lng * Math.PI / 180;
   const lat2 = Math.asin(Math.sin(lat1)*Math.cos(d) + Math.cos(lat1)*Math.sin(d)*Math.cos(b));
   const lng2 = lng1 + Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(lat1), Math.cos(d)-Math.sin(lat1)*Math.sin(lat2));
   return { lat: lat2 * 180/Math.PI, lng: lng2 * 180/Math.PI };
 }
-
+ 
+// Azimut entre deux points GPS
+function bearing(lat1, lng1, lat2, lng2) {
+  const toR = Math.PI/180;
+  const dL = (lng2-lng1)*toR;
+  const y = Math.sin(dL)*Math.cos(lat2*toR);
+  const x = Math.cos(lat1*toR)*Math.sin(lat2*toR) - Math.sin(lat1*toR)*Math.cos(lat2*toR)*Math.cos(dL);
+  return (Math.atan2(y,x)*180/Math.PI + 360) % 360;
+}
+ 
+// Distance haversine en mètres
+function haversineDist(lat1, lng1, lat2, lng2) {
+  const R = 6371000, toR = Math.PI/180;
+  const dLat = (lat2-lat1)*toR, dLng = (lng2-lng1)*toR;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*toR)*Math.cos(lat2*toR)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+ 
 // OBS
 function renderObs(){
   const el=document.getElementById('obs-list');
@@ -684,7 +769,7 @@ function exportCSV(){
   const r=observations.map(o=>`${o.frelon},${o.direction},${o.timeMs},${fmtMsLong(o.timeMs)},${distM(o.timeMs)},${o.pos?.lat||''},${o.pos?.lng||''},${o.timestamp}`).join('\n');
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([h+r],{type:'text/csv'})),download:'frelons.csv'});a.click();
 }
-
+ 
 // STATS
 function meanVec(){
   let sc=0,cc=0,tm=0;
@@ -709,12 +794,23 @@ function updateStats(){
     document.getElementById('st-sub').textContent=`~${dm}m · ${n} individus · ±${Math.round(dm*.25)}m d'incertitude`;
   }else{document.getElementById('st-est').textContent=`Encore ${3-n} obs. requises`;document.getElementById('st-sub').textContent='Pour une estimation fiable';}
 }
-
+ 
 // TOAST
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
-
+ 
 // INIT
 initGPS(); initCompass(); updateRefDisp(); renderSlots();
+ 
+// Remplir la grille de couleurs
+const grid = document.getElementById('color-grid');
+FRELONS.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.onclick = () => pickColor(i);
+  btn.style.cssText = `padding:14px 8px;border:2px solid ${f.color};border-radius:12px;background:white;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a2a1a`;
+  btn.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:${f.color};box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>${f.name}`;
+  grid.appendChild(btn);
+});
 </script>
 </body>
 </html>
+ 
